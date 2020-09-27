@@ -1,0 +1,3 @@
+// the configured options and settings for Tutorial
+#define dire_VERSION_MAJOR @dire_VERSION_MAJOR@
+#define dire_VERSION_MINOR @dire_VERSION_MINOR@
