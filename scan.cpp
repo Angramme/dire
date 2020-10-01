@@ -7,16 +7,71 @@
 #include "scan.h"
 #include "explore.h"
 
+
+
+kn_item* un_item::operator->() {
+	return mirror;
+}
+
+
+
 void cmd_scan(int argc, char** argv) {
 	fs::path cwd = fs::current_path();
 
-	std::stack<uFolder> unknown;
-	std::vector<Item> tree;
+	/*std::stack<uFolder> unknown;
+	std::vector<Item> tree;*/
 	
-	unknown.push({cwd.stem(), fs::directory_iterator(cwd)});
+	//unknown.push({cwd.stem(), fs::directory_iterator(cwd)});
+
+	std::stack<un_item> unknown;
+	std::vector<kn_item> tree;
+
+	tree.push_back({ 1, 0, 0, cwd.stem(), false });
+	unknown.push({ &*tree.end(), nullptr, fs::directory_iterator(cwd) });
 
 	while (!unknown.empty()) {
-		auto& parent = unknown.top();
+		auto& cur = unknown.top();
+
+		while (cur.iter != fs::end(cur.iter))
+		{
+			cur->sub_list_i = tree.size();
+
+			std::error_code err;
+			if (!cur.iter->exists(err) && !err) {
+				cur.iter++;
+			}
+			else if (cur.iter->is_directory(err) && !err) {
+				tree.push_back({ 0, 0, 0, cur.iter->path().stem(), false });
+				unknown.push({ &*tree.end(), cur.mirror, fs::directory_iterator(cur.iter->path()) });
+				cur->sub_count++;
+			}
+			else if(cur.iter->is_regular_file()) {
+				tree.push_back({ 0, 0, cur.iter->file_size(), cur.iter->path().stem(), false });
+				// this file is fully determined!
+				cur->sub_count++;
+				cur.known_sub_count++;
+				cur->disk_size += tree.end()->disk_size;
+			}
+
+			if (err) {
+				tree.push_back({ 0, 0, 0, cur.iter->path().stem(), true });
+				cur->sub_count++;
+				cur.known_sub_count++;
+				/// cur->disk_size += tree.end()->disk_size;
+			}
+		}
+
+		if (cur.iter == fs::end(cur.iter) && cur.known_sub_count == cur->sub_count) {
+			// this directory is fully known!!!
+			cur.parent->disk_size += cur->disk_size;
+			
+			unknown.pop();
+		}
+
+
+
+		
+		/*auto& parent = unknown.top();
 
 		if (parent.iter == fs::end(parent.iter)) {
 			tree.push_back(Item(parent.ksub, parent.rsub, parent.disk_size, parent.name, parent.access_denied));
@@ -55,7 +110,7 @@ void cmd_scan(int argc, char** argv) {
 				parent.ksub++;
 				parent.rsub++;
 			}
-		}
+		}*/
 	}
 
 	explore(tree);
