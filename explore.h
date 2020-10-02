@@ -2,4 +2,4 @@
 
 #include "scan.h"
 
-void explore(const std::vector<Item>& tree);
+void explore(const std::vector<kn_item>& tree);

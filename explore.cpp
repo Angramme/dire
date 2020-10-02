@@ -12,7 +12,7 @@
 
 
 
-void explore(const std::vector<Item>& tree) {
+void explore(const std::vector<kn_item>& tree) {
 	namespace tc = termcolor;
 
 	const fs::path root_cwd = fs::current_path();
@@ -20,7 +20,7 @@ void explore(const std::vector<Item>& tree) {
 	std::wstring message;
 	enum{INFO=0, WARN, ERR} message_type;
 
-	decltype(tree.crbegin()) root;
+	decltype(tree.cbegin()) root;
 
 	while (true) {
 		const fs::path cwd = fs::current_path();

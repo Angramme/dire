@@ -9,7 +9,7 @@
 
 #include "termcolor/termcolor.hpp"
 
-std::string pretty_size(const decltype(Item::disk_size)& size_bytes) {
+std::string pretty_size(const decltype(kn_item::disk_size)& size_bytes) {
 	double size = size_bytes;
 	unsigned int i = 0;
 	while (size > 1000.0) {
@@ -24,11 +24,11 @@ std::string pretty_size(const decltype(Item::disk_size)& size_bytes) {
 	return stream.str();
 }
 
-void tree_print(const std::vector<Item>& tree,
-	const std::vector<Item>::const_reverse_iterator& root) {
-	std::multimap<decltype(Item::disk_size), const Item*> sorted;
+void tree_print(const std::vector<kn_item>& tree,
+	const std::vector<kn_item>::const_iterator& root) {
+	std::multimap<decltype(kn_item::disk_size), const kn_item*> sorted;
 	auto it = root + 1;
-	for (int i = 0; i < root->sub; i++, it += it->rsub + 1) {
+	for (int i = 0; i < root->sub_count; i++, it++) {
 		sorted.insert(std::make_pair(it->disk_size, &(*it)));
 	}
 
