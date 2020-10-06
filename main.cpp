@@ -32,7 +32,7 @@ int main(int argc, char** argv){
 	std::locale::global(std::locale{ "" });
 
 	std::cout << "dire v" << dire_VERSION_MAJOR << "." << dire_VERSION_MINOR 
-		<< "(C) Kacper Ozi\251b\210owski 2020 \n" << std::endl;
+		<< "(C) Kacper Ozieblowski 2020 \n" << std::endl;
 
 	if (argc < 2) {
 		cmd_help(argc, argv);
@@ -47,6 +47,8 @@ int main(int argc, char** argv){
 			cmd_help(1, argv);
 		}
 	}
+
+	//cmd_scan(argc, argv);
 
     return 1;
 }

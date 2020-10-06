@@ -4,31 +4,44 @@
 namespace fs = std::filesystem;
 #include <string>
 
+struct kn_item;
+
 using filesize = decltype(std::declval<fs::directory_entry>().file_size());
+using Tree = std::vector<kn_item>;
 
 void cmd_scan(int argc, char** argv);
 
 
-struct kn_item;
 struct un_item {
-	kn_item* mirror;
-	kn_item* parent;
-
-	fs::directory_iterator iter;
-
-	unsigned int known_sub_count = 0; // count of elements with fully known properties i.e. size, count of sub-elements etc...
-	
-	kn_item* operator->();
+	size_t mirror_i;
+	size_t parent_i;
+	fs::path full_path;
+	bool visited = false;
 };
+//
+//struct un_item_ref {
+//	un_item& self;
+//	Tree& vec;
+//
+//	un_item_ref() = delete;
+//	un_item_ref(un_item& s, Tree& vec)
+//		: self(s), vec(vec)
+//	{}
+//
+//	Tree::iterator operator->();
+//	Tree::iterator parent();
+//};
 
 struct kn_item {
 	size_t sub_list_i;
-	unsigned int sub_count;
+	size_t sub_count;
 
 	filesize disk_size;
 	fs::path name;
 
 	bool access_denied;
+
+	size_t known_sub_count = 0; // count of elements with fully known properties i.e. size, count of sub-elements etc...
 };
 
 
