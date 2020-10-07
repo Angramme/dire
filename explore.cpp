@@ -10,9 +10,7 @@
 #include "treeutil.h"
 
 
-
-
-void explore(const std::vector<kn_item>& tree) {
+void explore(const Tree& tree) {
 	namespace tc = termcolor;
 
 	const fs::path root_cwd = fs::current_path();
@@ -20,20 +18,19 @@ void explore(const std::vector<kn_item>& tree) {
 	std::wstring message;
 	enum{INFO=0, WARN, ERR} message_type;
 
-	decltype(tree.cbegin()) root;
+	decltype(tree.cbegin()) root = tree.cbegin();
 
 	while (true) {
 		const fs::path cwd = fs::current_path();
 		const fs::path rel_cwd = cwd.lexically_relative(root_cwd);
-		std::cout << tc::yellow;
-		std::wcout << "cwd: " << cwd << "\n" << std::endl;
+		std::cout << tc::yellow << "cwd: " << tc::reset << tc::bold;
+		std::wcout << cwd << "\n" << std::endl;
 		std::cout << tc::reset;
 
-		root = tree_find(tree, rel_cwd);
 		tree_print(tree, root);
 
-		std::cout << tc::green << "\n\nType the name of folder to go inside or \"..\" to go back.";
-		std::cout << "\nType \":quit\" or \":exit\" to quit the program." << tc::reset << std::endl;
+		std::cout << tc::green << "\n\nType the name of folder to go inside or \"..\" to go back. Type :help to list all commands.";
+		//std::cout << "\nType \":quit\" or \":exit\" to quit the program." << tc::reset << std::endl;
 
 		if (!message.empty()) {
 			std::cout << "\n" << tc::grey;
@@ -55,10 +52,22 @@ void explore(const std::vector<kn_item>& tree) {
 		//std::wcin >> cmd;
 		std::cin.getline(cmd, sizeof(cmd));
 
-		std::cout << std::endl;
+		std::cout << "\n\n\n\n\n" << std::endl;
 
-		if (!strcmp(cmd, ":exit") || !strcmp(cmd, ":quit")) {
-			break;
+		//if (!strcmp(cmd, ":exit") || !strcmp(cmd, ":quit")) {
+			
+		if(cmd[0] == ':'){
+			const auto* cmds = cmd + 1;
+			if (!strcmp(cmds, "exit") || !strcmp(cmds, "quit")) { break; }
+			else if (!strcmp(cmds, "help")) { 
+				message_type = INFO;
+				message = L"\nuse \":help\" to print this help message"
+						  L"\nuse \":exit\" or \":quit\" to quit the application"
+					;
+			} else{
+				message_type = ERR;
+				message = L"This command does not exist, please use \":help\" to see the list of available commands.";
+			}
 		}
 		else if(!strcmp(cmd, "..")){
 			if (rel_cwd.empty() || rel_cwd == ".") {
@@ -67,12 +76,13 @@ void explore(const std::vector<kn_item>& tree) {
 			}
 			else {
 				fs::current_path("..");
+				root = tree_find(tree, fs::current_path().lexically_relative(root_cwd));
 			}
 		}
 		else {
 			const auto old_root = root;
 			root = tree_find(tree, rel_cwd / cmd);
-			if (root == tree.crend() || root->sub == 0) {
+			if (root == tree.cend() || root->sub_count == 0) {
 				message_type = ERR;
 				message = L"Couldn't find the directory \"";
 				message.append(cwd / cmd);
@@ -80,8 +90,8 @@ void explore(const std::vector<kn_item>& tree) {
 				root = old_root;
 			}
 			else {
-				fs::current_path(cmd); //CHANGE THIS!!!
-				//fs::current_path(root->name);
+				//fs::current_path(cmd); //CHANGE THIS!!!
+				fs::current_path(root->name);
 			}
 		}
 	}

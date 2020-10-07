@@ -24,10 +24,10 @@ std::string pretty_size(const decltype(kn_item::disk_size)& size_bytes) {
 	return stream.str();
 }
 
-void tree_print(const std::vector<kn_item>& tree,
-	const std::vector<kn_item>::const_iterator& root) {
+void tree_print(const Tree& tree, const Tree::const_iterator& root) {
 	std::multimap<decltype(kn_item::disk_size), const kn_item*> sorted;
-	auto it = root + 1;
+	//auto it = root + 1;
+	auto it = tree.cbegin() + root->sub_list_i;
 	for (int i = 0; i < root->sub_count; i++, it++) {
 		sorted.insert(std::make_pair(it->disk_size, &(*it)));
 	}
@@ -35,16 +35,11 @@ void tree_print(const std::vector<kn_item>& tree,
 	namespace tc = termcolor;
 
 	std::cout << tc::cyan << tc::bold;
-	std::cout << "Relative  Size        Name                " << tc::reset << std::endl;
+	std::cout << "Relative  Size        Name                " << tc::reset << "\n";
 	std::cout << "--------  ----------  --------------------" << std::endl;
 
 	for (auto it = sorted.rbegin(); it != sorted.rend(); it++) {
 		const auto& item = it->second;
-		/*wprintf(L"%6.1f%%   %10s   %.20s\n",
-			(float)item->disk_size / root->disk_size*100.0,
-			item->access_denied ? L"ERROR" : pretty_size(item->disk_size).c_str(),
-			item->name.c_str());*/
-
 		printf("%6.1f%%   %10s   %.20s\n",
 			(float)item->disk_size / root->disk_size*100.0,
 			item->access_denied ? "ERROR" : pretty_size(item->disk_size).c_str(),

@@ -31,8 +31,12 @@ subcmd* get_cmd(char* name) {
 int main(int argc, char** argv){
 	std::locale::global(std::locale{ "" });
 
-	std::cout << "dire v" << dire_VERSION_MAJOR << "." << dire_VERSION_MINOR 
-		<< "(C) Kacper Ozieblowski 2020 \n" << std::endl;
+	std::ios::sync_with_stdio(0);
+	std::cin.tie(0);
+	std::cout.tie(0);
+
+	std::cout << "DIRE v" << dire_VERSION_MAJOR << "." << dire_VERSION_MINOR 
+		<< "  (C) Kacper Ozieblowski 2020 \n" << std::endl;
 
 	if (argc < 2) {
 		cmd_help(argc, argv);
@@ -47,8 +51,6 @@ int main(int argc, char** argv){
 			cmd_help(1, argv);
 		}
 	}
-
-	//cmd_scan(argc, argv);
 
     return 1;
 }

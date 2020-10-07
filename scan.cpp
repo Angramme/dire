@@ -1,4 +1,3 @@
-#include <iostream>
 #include <stack>
 #include <vector>
 
@@ -9,9 +8,6 @@
 
 
 void cmd_scan(int argc, char** argv) {
-	//fs::current_path("C:/users/kicia/desktop/test_folder");
-
-
 	fs::path cwd = fs::current_path();
 
 	std::stack<un_item> unknown;

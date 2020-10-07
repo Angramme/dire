@@ -1,5 +1,5 @@
 #pragma once
 #include "scan.h"
 
-void tree_print(const std::vector<kn_item>& tree,
-	const std::vector<kn_item>::const_iterator& root);
+void tree_print(const Tree& tree,
+	const Tree::const_iterator& root);
