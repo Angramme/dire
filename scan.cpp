@@ -1,5 +1,6 @@
 #include <stack>
 #include <vector>
+#include <chrono>
 
 #include "termcolor/termcolor.hpp"
 
@@ -8,6 +9,8 @@
 
 
 void cmd_scan(int argc, char** argv) {
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
 	fs::path cwd = fs::current_path();
 
 	std::stack<un_item> unknown;
@@ -24,7 +27,7 @@ void cmd_scan(int argc, char** argv) {
 		if (!cur.visited) {
 			cur.visited = true;
 			cur_mirror.sub_list_i = tree.size();
-			auto cur_iter = fs::directory_iterator(cur.full_path);
+			auto cur_iter = fs::directory_iterator(cur.full_path, std::filesystem::directory_options::skip_permission_denied);
 			while (cur_iter != fs::end(cur_iter))
 			{
 				std::error_code err;
@@ -58,6 +61,11 @@ void cmd_scan(int argc, char** argv) {
 #undef cur_mirror
 #undef cur_parent
 	}
+
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	std::cout << "Finished the scan in " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << "[ns] ~= ";
+	std::cout << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "[s]" << std::endl;
+
 
 	explore(tree);
 }
